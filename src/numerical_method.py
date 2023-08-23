@@ -210,20 +210,11 @@ class BlackScholesPDE(PDEMethod):
         self.df = model.get_df(self.exp - self.time_disc)
 
     def setup_boundary_conditions(self):
-        if self.derivative_type == PutCallFwd.CALL:
-            # initial condition
-            self.grid[-1, :] = np.maximum(self.stock_disc - self.strike, 0)
-            # right boundary
-            self.grid[:, -1] = self.stock_max - self.strike * self.df
+        # TODO Implement the boundary conditions for Call/Put Options
 
-        elif self.derivative_type == PutCallFwd.PUT:
-            # initial condition
-            self.grid[-1, :] = np.maximum(self.strike - self.stock_disc, 0)
-            # left condition
-            self.grid[:, 0] = self.strike * self.df - self.stock_min
-
-        else:
-            self.contract.raise_incorrect_derivative_type_error()
+        # else:
+        #     self.contract.raise_incorrect_derivative_type_error()
+        pass
 
     def explicit_method(self):
         self.setup_boundary_conditions()
