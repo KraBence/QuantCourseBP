@@ -173,11 +173,8 @@ class MCParams(Params):
 class PDEParams(Params):
     def __init__(self, und_step: int = 2, time_step: float = 1/1200, stock_min_mult: int = 0, stock_max_mult: int = 2,
                  method: BSPDEMethod = BSPDEMethod.EXPLICIT) -> None:
-        self.und_step = und_step  # dS
-        self.time_step = time_step  # dt
-        self.stock_min_mult = stock_min_mult
-        self.stock_max_mult = stock_max_mult
-        self.method = method
+        # TODO: Implement Attributes
+        pass
 
 
 class TreeParams(Params):
