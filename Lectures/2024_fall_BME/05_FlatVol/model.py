@@ -1,5 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
+
+from scipy.constants import point
+
 from market_data import *
 from enums import *
 import numpy as np
@@ -31,3 +34,23 @@ class MarketModel(ABC):
     @abstractmethod
     def get_vol(self, strike: float, expiry: float) -> float:
         pass
+
+
+class BSVolModel(MarketModel):
+    def __init__(self, underlying: Stock) -> None:
+        super().__init__(underlying)
+
+    def get_vol(self, strike: float, expiry: float) -> float:
+        atm_strike = 1.0 * self.spot
+        expiry = 1.0
+        coordinate = np.array([(atm_strike, expiry)])
+        return self.volgrid.get_vol(coordinate)[0]
+
+
+class FlatVolModel(MarketModel):
+    def __init__(self, underlying: Stock) -> None:
+        super().__init__(underlying)
+
+    def get_vol(self, strike: float, expiry: float) -> float:
+        coordinate = np.array([(strike, expiry)])
+        return self.volgrid.get_vol(coordinate)[0]
