@@ -615,5 +615,55 @@ class BarrierBrownianBridgePricer(Pricer):
     def calc_fair_value(self) -> float:
         return self.calc_fair_value_with_ci()[0]
 
+    
+class EuropeanDigitalAnalyticPricer:
+    def __init__(self, contract: EuropeanDigitalContract, spot: float, volatility: float, interest_rate: float):
+        self.contract = contract
+        self.spot = spot
+        self.volatility = volatility
+        self.interest_rate = interest_rate
+
+    def price(self) -> float:
+        K = self.contract.strike
+        T = self.contract.maturity
+        P = self.contract.payout
+        r = self.interest_rate
+        sigma = self.volatility
+        S0 = self.spot
+
+        d2 = (np.log(S0 / K) + (r - 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        
+        if self.contract.option_type == "call":
+            return P * np.exp(-r * T) * norm.cdf(d2)
+        else:  # put
+            return P * np.exp(-r * T) * norm.cdf(-d2)
+
+    def greeks(self) -> Dict[str, float]:
+        K = self.contract.strike
+        T = self.contract.maturity
+        P = self.contract.payout
+        r = self.interest_rate
+        sigma = self.volatility
+        S0 = self.spot
+
+        d1 = (np.log(S0 / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
+        d2 = d1 - sigma * np.sqrt(T)
+        
+        N_prime_d2 = norm.pdf(d2)  # Probability density at d2
+
+
+        delta = (P * np.exp(-r * T) * N_prime_d2) / (S0 * sigma * np.sqrt(T))
+        gamma = -delta / (S0 * sigma * np.sqrt(T))
+        vega = -P * np.exp(-r * T) * N_prime_d2 * d1 / sigma
+        theta = -P * np.exp(-r * T) * N_prime_d2 * (r - d2 / (2 * T))
+        rho = -T * P * np.exp(-r * T) * norm.cdf(d2) if self.contract.option_type == "call" else -T * P * np.exp(-r * T) * norm.cdf(-d2)
+
+        return {
+            "delta": delta,
+            "gamma": gamma,
+            "vega": vega,
+            "theta": theta,
+            "rho": rho
+        }
 
 

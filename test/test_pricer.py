@@ -175,3 +175,27 @@ class TestEuropeanPDEPricer:
         pricer = EuropeanPDEPricer(self.contract, self.model, param)
         pv = pricer.calc_fair_value()
         assert pv == pytest.approx(expected_pv)
+
+
+class TestDigitalOptionPricer:
+    # Parameters for the test
+    strike = 100.0
+    maturity = 1.0  # 1 year
+    payout = 10.0
+    spot = 105.0
+    volatility = 0.2
+    interest_rate = 0.05
+
+    d2 = (np.log(spot / strike) + (interest_rate - 0.5 * volatility**2) * maturity) / (volatility * np.sqrt(maturity))
+    expected_call_price = payout * np.exp(-interest_rate * maturity) * norm.cdf(d2)
+    expected_put_price = payout * np.exp(-interest_rate * maturity) * (1 - norm.cdf(d2))
+
+    @pytest.mark.parametrize("option_type, expected_price", [
+        ("call", expected_call_price),
+        ("put", expected_put_price)
+    ])
+    def test_fair_value(self, option_type, expected_price):
+        contract = EuropeanDigitalContract(self.strike, self.maturity, self.payout, option_type)
+        pricer = EuropeanDigitalAnalyticPricer(contract, self.spot, self.volatility, self.interest_rate)
+        calculated_price = pricer.price()
+        assert calculated_price == pytest.approx(expected_price, rel=1e-5)

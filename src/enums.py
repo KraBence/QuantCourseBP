@@ -53,3 +53,8 @@ class MCNumMethod(str, Enum):
     EULER: str = 'EULER'
     MILSTEIN: str = 'MILSTEIN'
     EXACT: str = 'EXACT'
+
+class StockEnum(Enum):
+    STOCK1 = 'stock1'
+    STOCK2 = 'stock2'
+    STOCK3 = 'stock3'

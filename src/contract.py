@@ -210,3 +210,13 @@ class Barrier:
 
     def raise_incorrect_in_out_type(self):
         raise TypeError(f'Inout parameter of {type(self).__name__} must be IN or OUT')
+
+        
+        
+class EuropeanDigitalContract:
+    def __init__(self, strike: float, maturity: float, payout: float, option_type: str):
+        assert option_type in ["call", "put"], "option_type must be 'call' or 'put'"
+        self.strike = strike
+        self.maturity = maturity
+        self.payout = payout
+        self.option_type = option_type
